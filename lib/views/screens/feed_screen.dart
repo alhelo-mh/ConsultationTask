@@ -13,17 +13,35 @@ class FeedHomeScreen extends StatefulWidget {
 
 class _FeedHomeScreenState extends State<FeedHomeScreen> {
   List<Widget> itemList = [];
+  bool isLoading = false;
 
   @override
   void initState() {
+    setState(() {});
     for (int i = 0; i < consultations.length; i++) {
       itemList.add(buildConsultationItem(consultations[i]));
-
-      if ((i + 1) % 2 == 0 && advertisements.isNotEmpty) {
-        itemList.add(buildAdvertisementItem(advertisements.removeAt(0)));
-      }
     }
-    itemList.addAll(advertisements.map((ad) => buildAdvertisementItem(ad)));
+    Future.delayed(const Duration(seconds: 5), () {
+      itemList.clear();
+      for (int i = 0; i < consultations.length; i++) {
+        itemList.add(buildConsultationItem(consultations[i]));
+        if ((i + 1) % 2 == 0 && advertisements.isNotEmpty) {
+          if (isLoading == false) {
+            if (mounted) {
+              setState(() {
+                isLoading = true;
+              });
+            }
+          }
+          setState(() {});
+          itemList.add(
+              buildAdvertisementItem(advertisements.removeAt(0), isLoading));
+        }
+      }
+    });
+    itemList.addAll(
+        advertisements.map((ad) => buildAdvertisementItem(ad, isLoading)));
+
     super.initState();
   }
 
